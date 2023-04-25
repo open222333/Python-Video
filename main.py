@@ -46,7 +46,7 @@ try:
         http_url_of_key=f'{NGS_AVDATA_HOST}/test/key_av1_480.key',
         key_path_in_loacl=f'{args.output}/key_av1_480.key',
         keyinfo_dir=args.output,
-        p='480'
+        p='av1_480'
     )
     videoConvertToEncryptedM3U8(
         video_path=f'{args.output}/{av1_video_name}',
@@ -81,7 +81,7 @@ try:
         http_url_of_key=f'{NGS_AVDATA_HOST}/test/key_h264_480.key',
         key_path_in_loacl=f'{args.output}/key_h264_480.key',
         keyinfo_dir=args.output,
-        p='480'
+        p='h264_480'
     )
     videoConvertToEncryptedM3U8(
         video_path=f'{args.output}/{h264_video_name}',
