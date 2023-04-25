@@ -74,9 +74,9 @@ def videoConvertToTs(video_path: str, output_video_dir: str, output_video_name: 
             return ''
     else:
         if p == '240':
-            command = f'ffmpeg -i {video_path} -c:v {encoding} -c:a aac -b:a 192k -r 30 -ar 44100 -video_track_timescale 90000 -vf scale=-2:240 {output_video_dir}/{video_name} -y'
+            command = f'ffmpeg -i {video_path} -c:v {encoding} -c:a aac -b:a 192k -r 30 -ar 44100 -vf scale=-2:240 {output_video_dir}/{video_name} -y'
         elif p == '480':
-            command = f'ffmpeg -i {video_path} -c:v {encoding} -c:a aac -b:a 192k -r 30 -ar 44100 -video_track_timescale 90000 -vf scale=-2:720 {output_video_dir}/{video_name} -y'
+            command = f'ffmpeg -i {video_path} -c:v {encoding} -c:a aac -b:a 192k -r 30 -ar 44100 -vf scale=-2:720 {output_video_dir}/{video_name} -y'
         else:
             return ''
 
