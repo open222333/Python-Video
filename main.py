@@ -35,7 +35,7 @@ try:
     )
     timer.stop()
     h264_size = os.path.getsize(f"{args.output}/{h264_video_name}")
-    msg = f'\n\n轉換結果:\n原檔案大小: {origin_size}\n轉換後檔案大小: {h264_size}\n{timer.get_result()}'
+    msg = f'\n\n轉換結果:\n原檔案路徑: {args.path}\n原檔案大小: {origin_size}\n轉換後檔案大小: {h264_size}\n{timer.get_result()}\n\n'
     video_log.info(msg)
 
     # 轉換成av1
@@ -51,7 +51,7 @@ try:
     )
     timer.stop()
     av1_size = os.path.getsize(f"{args.output}/{av1_video_name}")
-    msg = f'\n\n轉換結果:\n原檔案大小: {origin_size}\n轉換後檔案大小: {av1_size}\n{timer.get_result()}'
+    msg = f'\n\n轉換結果:\n原檔案路徑: {f"{args.output}/{h264_video_name}"}\n原檔案大小: {origin_size}\n轉換後檔案大小: {av1_size}\n{timer.get_result()}\n\n'
     video_log.info(msg)
 
     # # 轉換成m3u8
