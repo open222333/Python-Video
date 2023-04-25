@@ -23,11 +23,27 @@ origin_size = os.path.getsize(args.path)
 timer = Timer()
 
 try:
+    # 轉換成ts-h264
+    timer.set_name('轉換成ts-h264')
+    timer.start()
+    h264_video_name = videoConvertToTs(
+        video_path=args.path,
+        output_video_dir=args.output,
+        output_video_name='test-h264',
+        video_encoding='h264',
+        p='480'
+    )
+    timer.stop()
+    h264_size = os.path.getsize(f"{args.output}/{h264_video_name}")
+    msg = f'\n\n轉換結果:\n原檔案大小: {origin_size}\n轉換後檔案大小: {h264_size}\n{timer.get_result()}'
+    video_log.info(msg)
+
     # 轉換成av1
     timer.set_name('轉換成av1')
     timer.start()
     av1_video_name = videoConvertToTs(
-        video_path=args.path,
+        # video_path=args.path,
+        video_path=f"{args.output}/{h264_video_name}",
         output_video_dir=args.output,
         output_video_name='test-av1',
         video_encoding='av1',
@@ -35,7 +51,7 @@ try:
     )
     timer.stop()
     av1_size = os.path.getsize(f"{args.output}/{av1_video_name}")
-    msg = f'原檔案大小: {origin_size}\n轉換後檔案大小: {av1_size}\n{timer.get_result()}'
+    msg = f'\n\n轉換結果:\n原檔案大小: {origin_size}\n轉換後檔案大小: {av1_size}\n{timer.get_result()}'
     video_log.info(msg)
 
     # # 轉換成m3u8
@@ -56,22 +72,6 @@ try:
     # )
     # timer.stop()
     # video_log.info(timer.get_result())
-
-
-    # # 轉換成ts-h264
-    # timer.set_name('轉換成ts-h264')
-    # timer.start()
-    # h264_video_name = videoConvertToTs(
-    #     video_path=args.path,
-    #     output_video_dir=args.output,
-    #     output_video_name='test-h264',
-    #     video_encoding='h264',
-    #     p='480'
-    # )
-    # timer.stop()
-    # h264_size = os.path.getsize(f"{args.output}/{av1_video_name}")
-    # msg = f'原檔案大小: {origin_size}\n轉換後檔案大小: {h264_size}\n{timer.get_result()}'
-    # video_log.info(msg)
 
     # # 轉換成m3u8
     # timer.set_name('h264轉換成m3u8')
