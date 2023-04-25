@@ -35,7 +35,8 @@ def videoConvertToTs(video_path: str, output_video_dir: str, output_video_name: 
     elif video_encoding == 'h265':
         encoding = 'libx265 -crf 28 -tune fastdecode'
     elif video_encoding == 'av1':
-        encoding = 'libaom-av1 -crf 30'
+        # encoding = 'libaom-av1 -crf 30'
+        encoding = ' libsvtav1 -preset 10 -crf 35'
         # encoding = 'libsvtav1'
         # encoding = 'librav1e'
     else:
