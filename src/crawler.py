@@ -35,14 +35,11 @@ def videoConvertToTs(video_path: str, output_video_dir: str, output_video_name: 
     elif video_encoding == 'h265':
         encoding = 'libx265 -crf 28 -tune fastdecode'
     elif video_encoding == 'av1':
-        # encoding = 'libaom-av1 -crf 30'
-        encoding = ' libsvtav1 -preset 10 -crf 35'
-        # encoding = 'libsvtav1'
+        encoding = 'libaom-av1 -preset 10 -crf 30'
+        # encoding = 'libsvtav1 -preset 10 -crf 35'
         # encoding = 'librav1e'
     else:
         return ''
-
-    video_name = f'{output_video_name}-{p}.ts'
 
     if video_encoding in ['h264', 'h265']:
         '''
@@ -69,6 +66,7 @@ def videoConvertToTs(video_path: str, output_video_dir: str, output_video_name: 
         http://ffmpeg.org/ffmpeg-all.html#filter_005foption
 
         '''
+        video_name = f'{output_video_name}-{p}.ts'
         if p == '240':
             command = f'ffmpeg -i {video_path} -c:v {encoding} -c:a aac -b:a 192k -r 30 -ar 44100 -video_track_timescale 90000 -vf scale=-2:240 {output_video_dir}/{video_name} -y'
         elif p == '480':
@@ -76,6 +74,7 @@ def videoConvertToTs(video_path: str, output_video_dir: str, output_video_name: 
         else:
             return ''
     else:
+        video_name = f'{output_video_name}-{p}.mp4'
         if p == '240':
             command = f'ffmpeg -i {video_path} -c:v {encoding} -c:a copy -r 30 -ar 44100 -vf scale=-2:240 {output_video_dir}/{video_name} -y'
         elif p == '480':
