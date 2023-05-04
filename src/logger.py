@@ -168,7 +168,7 @@ if not os.path.exists(LOG_PATH) and not LOG_DISABLE:
 if LOG_DISABLE:
     logging.disable()
 else:
-    log_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    log_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 
     if LOG_SIZE:
         log_file = f'{LOG_PATH}/{HOSTNAME}-mega.log'

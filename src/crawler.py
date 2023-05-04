@@ -1,7 +1,8 @@
 import os
 from .logger import logger
 
-def videoConvertToTs(video_path: str, output_video_dir: str, output_video_name: str, video_encoding: str, p: str) -> str:
+
+def videoConvertToTs(video_path: str, output_video_dir: str, output_video_name: str, video_encoding: str, p: str, test: str = False) -> str:
     """影片轉檔成ts格式
 
     ffmpeg Documentation:
@@ -20,6 +21,7 @@ def videoConvertToTs(video_path: str, output_video_dir: str, output_video_name: 
         output_video_name (str): 檔名，不需要副檔名以及畫質
         video_encoding (str): h264, h265, av1
         p (str): 標清給240 高清給480
+        test (bool, optional): 只顯示訊息(測試用). Defaults to False.
 
     Returns:
         str: 檔名
@@ -82,34 +84,39 @@ def videoConvertToTs(video_path: str, output_video_dir: str, output_video_name: 
         else:
             return ''
 
-    logger.debug(f'指令 {command}')
-    os.system(command)
+    logger.debug(f'\n指令\n{command}')
+    if not test:
+        os.system(command)
 
     logger.info('=== videoConvertToTs end ===')
     return video_name
 
 
-def generateEnctyptionKey(key_dir, p):
-    '''產生加密的key
-
-    key_dir: key所在的資料夾路徑
-    p: '240' or '480'
-
+def generateEnctyptionKey(key_dir: str, p: str, test: bool = False) -> str:
+    """產生加密的key
     key file 用 openssl 產生一個 16位元的 binary key
     key 產完之後 要上傳到 s3 (回傳key file, 請呼叫端自己上傳)
-    '''
 
+    Args:
+        key_dir (str): key所在的資料夾路徑
+        p (str): '240' or '480' key_{p}.key
+        test (bool, optional): 只顯示訊息(測試用). Defaults to False.
+
+    Returns:
+        str: 回傳字串 key_{p}.key
+    """
     logger.info('=== generateEnctyptionKey start ===')
 
     key_name = f'key_{p}.key'
     command = f'openssl rand 16 > {key_dir}/{key_name}'
-    logger.debug(f'指令 {command}')
-    os.system(command)
+    logger.debug(f'\n指令\n{command}')
+    if not test:
+        os.system(command)
     logger.info('=== generateEnctyptionKey end ===')
     return key_name
 
 
-def generateEnctyptionKeyInfo(http_url_of_key: str, key_path_in_loacl: str, keyinfo_dir: str, p: str) -> str:
+def generateEnctyptionKeyInfo(http_url_of_key: str, key_path_in_loacl: str, keyinfo_dir: str, p: str, test: bool = False) -> str:
     """產生加密m3u8時需要的keyinfo
     key info format
     key URI        = http_url_of_key
@@ -121,32 +128,70 @@ def generateEnctyptionKeyInfo(http_url_of_key: str, key_path_in_loacl: str, keyi
         key_path_in_loacl (str): _description_
         keyinfo_dir (str): _description_
         p (str): '240' or '480'
+        test (bool, optional): 只顯示訊息(測試用). Defaults to False.
 
     Returns:
-        str: _description_
+        str: 'key_{p}.keyinfo'
     """
     logger.info('=== generateEnctyptionKeyInfo start ===')
     keyinfo = f'key_{p}.keyinfo'
     iv = os.popen('openssl rand -hex 16').read()
     data = f'{http_url_of_key}\n{key_path_in_loacl}\n{iv}'
-    with open(f'{keyinfo_dir}/{keyinfo}', 'w') as k:
-        k.write(data)
+    logger.debug(f'\n產生檔案:\n{keyinfo_dir}/{keyinfo}')
+    logger.debug(f'\ndata:\n{data}')
+    if not test:
+        with open(f'{keyinfo_dir}/{keyinfo}', 'w') as k:
+            k.write(data)
     logger.info('=== generateEnctyptionKeyInfo end ===')
     return keyinfo
 
 
-def videoConvertToEncryptedM3U8(video_path: str, keyinfo_path: str, output_video_dir: str, output_video_name: str):
+def videoConvertToEncryptedM3U8(video_path: str, keyinfo_path: str, output_video_dir: str, output_video_name: str, test: bool = False):
     """影片轉成加密的m3u8
     Args:
         video_path (str): _description_
         keyinfo_path (str): _description_
         output_video_dir (str): _description_
         output_video_name (str): _description_
+        test (bool, optional): 只顯示訊息(測試用). Defaults to False.
     """
     logger.info('=== videoConvertToM3U8 start ===')
     if not os.path.exists(output_video_dir):
         os.mkdir(output_video_dir)
 
     command = f'ffmpeg -i {video_path} -c copy -hls_segment_type mpegts -hls_time 10 -start_number 1 -hls_key_info_file {keyinfo_path} -hls_segment_filename {output_video_dir}/{output_video_name}_%05d.ts -hls_list_size 0 -hls_playlist_type vod -hls_flags delete_segments+split_by_time {output_video_dir}/{output_video_name}.m3u8 -y'
-    os.system(command)
+    logger.debug(f'\n指令\n{command}')
+    if not test:
+        os.system(command)
     logger.info('=== videoConvertToM3U8 end ===')
+
+
+def removeM3U8KeyHost(m3u8_path_in_local: str, key_dir_in_s3: str, key_name: str, test: bool = False):
+    """
+    https://S3_DOMAIN/path/key_480.key
+    key_dir_in_s3 = https://S3_DOMAIN/path
+    key_name = key_480.key
+
+    Args:
+        m3u8_path_in_local (str): 本地的m3u8檔案
+        key_dir_in_s3 (str): s3上key路徑
+        key_name (str): s3上key名稱
+        test (bool, optional): 只顯示訊息(測試用). Defaults to False.
+    """
+    file_data = ''
+
+    logger.debug(f'\nm3u8_path_in_local:\n{m3u8_path_in_local}')
+    if not test:
+        with open(m3u8_path_in_local, 'r', encoding='utf-8') as f:
+            for line in f:
+                if key_name in line:
+                    old = f'{key_dir_in_s3}/{key_name}'
+                    newline = line.replace(old, key_name)
+                    file_data += newline
+                else:
+                    file_data += line
+    logger.debug(f'\nold file_data:\n{key_dir_in_s3}/{key_name}')
+    logger.debug(f'\nnew file_data:\n{file_data}')
+    if not test:
+        with open(m3u8_path_in_local, 'w', encoding='utf-8') as f:
+            f.write(file_data)
