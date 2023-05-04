@@ -1,6 +1,7 @@
 from src.timer import Timer
 from src.logger import Log
 from src.crawler import videoConvertToTs, videoConvertToEncryptedM3U8, generateEnctyptionKey, generateEnctyptionKeyInfo, removeM3U8KeyHost
+from src.tool import human_readable_size
 from src import NGS_AVDATA_HOST, LOG_LEVEL
 
 from argparse import ArgumentParser
@@ -8,6 +9,7 @@ import os
 
 video_log = Log('main_result')
 video_log.set_level(LOG_LEVEL)
+video_log.set_log_formatter('%(asctime)s %(levelname)s - %(message)s')
 video_log.set_file_handler()
 video_log.set_msg_handler()
 
@@ -30,7 +32,7 @@ try:
     if args.convert_video:
         if args.type == 'all' or args.type == 'h264':
             # 轉換成ts-h264
-            timer.set_name('轉換成ts-h264')
+            timer.set_name('轉換成h264')
             timer.start()
             h264_video_name = videoConvertToTs(
                 video_path=args.path,
@@ -45,7 +47,7 @@ try:
                 h264_size = 0
             else:
                 h264_size = os.path.getsize(f"{args.output}/{h264_video_name}")
-            msg = f'\n\n轉換結果:\n原檔案路徑: {args.path}\n原檔案大小: {origin_size}\n轉換後檔案大小: {h264_size}\n{timer.get_result()}\n\n'
+            msg = f'\n{timer.name} 轉換結果:\n原檔案路徑: {args.path}\n原檔案大小: {human_readable_size(origin_size)}\n轉換後檔案大小: {human_readable_size(h264_size)}\n{timer.get_result()}\n'
             video_log.info(msg)
 
         if args.type == 'all' or args.type == 'av1':
@@ -54,7 +56,6 @@ try:
             timer.start()
             av1_video_name = videoConvertToTs(
                 video_path=args.path,
-                # video_path=f"{args.output}/{h264_video_name}",
                 output_video_dir=args.output,
                 output_video_name='test-av1',
                 video_encoding='av1',
@@ -66,9 +67,12 @@ try:
                 av1_size = 0
             else:
                 av1_size = os.path.getsize(f"{args.output}/{av1_video_name}")
-            msg = f'\n\n轉換結果:\n原檔案路徑: {args.path}\n原檔案大小: {origin_size}\n轉換後檔案大小: {av1_size}\n{timer.get_result()}\n\n'
+            msg = f'\n{timer.name} 轉換結果:\n原檔案路徑: {args.path}\n原檔案大小: {human_readable_size(origin_size)}\n轉換後檔案大小: {human_readable_size(av1_size)}\n{timer.get_result()}\n'
             video_log.info(msg)
-
+    else:
+        h264_video_name = 'test-h264.mp4'
+        av1_video_name = 'test-av1.mp4'
+        
     if args.convert_m3u8:
         if args.type == 'all' or args.type == 'h264':
             # h264轉換成m3u8
@@ -94,7 +98,7 @@ try:
                 test=args.onlymessage
             )
             timer.stop()
-            video_log.info(f'\n{timer.get_result()}')
+            video_log.info(f'\n{timer.name} 結果:\n{timer.get_result()}\n')
 
         if args.type == 'all' or args.type == 'av1':
             # 轉換成m3u8
@@ -126,6 +130,6 @@ try:
             #     test=args.onlymessage
             # )
             timer.stop()
-            video_log.info(f'\n{timer.get_result()}')
+            video_log.info(f'\n{timer.name} 結果:\n{timer.get_result()}\n')
 except Exception as err:
     video_log.error(err, exc_info=True)

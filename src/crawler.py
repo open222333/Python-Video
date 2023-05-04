@@ -26,7 +26,7 @@ def videoConvertToTs(video_path: str, output_video_dir: str, output_video_name: 
     Returns:
         str: 檔名
     """
-    logger.info('=== videoConvertToTs start ===')
+    logger.debug('=== videoConvertToTs start ===')
     encoding = ''
 
     if not os.path.exists(output_video_dir):
@@ -88,7 +88,7 @@ def videoConvertToTs(video_path: str, output_video_dir: str, output_video_name: 
     if not test:
         os.system(command)
 
-    logger.info('=== videoConvertToTs end ===')
+    logger.debug('=== videoConvertToTs end ===')
     return video_name
 
 
@@ -105,14 +105,14 @@ def generateEnctyptionKey(key_dir: str, p: str, test: bool = False) -> str:
     Returns:
         str: 回傳字串 key_{p}.key
     """
-    logger.info('=== generateEnctyptionKey start ===')
+    logger.debug('=== generateEnctyptionKey start ===')
 
     key_name = f'key_{p}.key'
     command = f'openssl rand 16 > {key_dir}/{key_name}'
     logger.debug(f'\n指令\n{command}')
     if not test:
         os.system(command)
-    logger.info('=== generateEnctyptionKey end ===')
+    logger.debug('=== generateEnctyptionKey end ===')
     return key_name
 
 
@@ -133,7 +133,7 @@ def generateEnctyptionKeyInfo(http_url_of_key: str, key_path_in_loacl: str, keyi
     Returns:
         str: 'key_{p}.keyinfo'
     """
-    logger.info('=== generateEnctyptionKeyInfo start ===')
+    logger.debug('=== generateEnctyptionKeyInfo start ===')
     keyinfo = f'key_{p}.keyinfo'
     iv = os.popen('openssl rand -hex 16').read()
     data = f'{http_url_of_key}\n{key_path_in_loacl}\n{iv}'
@@ -142,7 +142,7 @@ def generateEnctyptionKeyInfo(http_url_of_key: str, key_path_in_loacl: str, keyi
     if not test:
         with open(f'{keyinfo_dir}/{keyinfo}', 'w') as k:
             k.write(data)
-    logger.info('=== generateEnctyptionKeyInfo end ===')
+    logger.debug('=== generateEnctyptionKeyInfo end ===')
     return keyinfo
 
 
@@ -155,7 +155,7 @@ def videoConvertToEncryptedM3U8(video_path: str, keyinfo_path: str, output_video
         output_video_name (str): _description_
         test (bool, optional): 只顯示訊息(測試用). Defaults to False.
     """
-    logger.info('=== videoConvertToM3U8 start ===')
+    logger.debug('=== videoConvertToM3U8 start ===')
     if not os.path.exists(output_video_dir):
         os.mkdir(output_video_dir)
 
@@ -163,7 +163,7 @@ def videoConvertToEncryptedM3U8(video_path: str, keyinfo_path: str, output_video
     logger.debug(f'\n指令\n{command}')
     if not test:
         os.system(command)
-    logger.info('=== videoConvertToM3U8 end ===')
+    logger.debug('=== videoConvertToM3U8 end ===')
 
 
 def removeM3U8KeyHost(m3u8_path_in_local: str, key_dir_in_s3: str, key_name: str, test: bool = False):

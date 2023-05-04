@@ -31,11 +31,12 @@ class Timer:
     def stop(self):
         self.second = datetime.now().timestamp() - self.second
 
-    def get_time_str(self, total_secends: Union[int, float]) -> str:
+    def get_time_str(self, total_secends: Union[int, float], decimal_places: int = 2) -> str:
         """依照秒數 回傳中文時間
 
         Args:
             total_secends (int): 總秒數
+            decimal_places (int, optional): 顯示小數位. Defaults to 2.
 
         Returns:
             str: 回傳時間
@@ -46,13 +47,13 @@ class Timer:
         hours = ((total_secends // 60) // 60) % 24
         days = ((total_secends // 60) // 60) // 24
         if days != 0:
-            msg += f"{days}天"
+            msg += f"{days:.{decimal_places}f}天"
         if hours != 0:
-            msg += f"{hours}時"
+            msg += f"{hours:.{decimal_places}f}時"
         if minutes != 0:
-            msg += f"{minutes}分"
+            msg += f"{minutes:.{decimal_places}f}分"
         if seconds != 0:
-            msg += f"{seconds}秒"
+            msg += f"{seconds:.{decimal_places}f}秒"
         return msg
 
     def get_result(self) -> str:
@@ -62,6 +63,6 @@ class Timer:
             str: 結果訊息
         """
         if self.detail:
-            return f'{self.name}\n{self.detail}\n經過時間: {self.get_time_str(self.second)}'
+            return f'{self.detail}\n經過時間: {self.get_time_str(self.second, 0)}'
         else:
-            return f'{self.name}\n經過時間: {self.get_time_str(self.second)}'
+            return f'經過時間: {self.get_time_str(self.second, 0)}'
