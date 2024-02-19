@@ -21,3 +21,6 @@ LOG_SIZE = conf.getint('DEFAULT', 'LOG_SIZE', fallback=0)
 LOG_DAYS = conf.getint('DEFAULT', 'LOG_DAYS', fallback=7)
 
 NGS_AVDATA_HOST = conf.get('HOST', 'NGS_AVDATA_HOST', fallback=None)
+
+IG_USERNAME = conf.get('INSTAGRAM', 'USERNAME', fallback=None)
+IG_PASSWORD = conf.get('INSTAGRAM', 'PASSWORD', fallback=None)
